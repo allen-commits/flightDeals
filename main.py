@@ -21,7 +21,9 @@ for city_data in sheet_data:
     if iata_code == "":
         my_data_manager.populate_IATA_code(iataCode=dest_code, id=city_id)
         #my flight tracker sheet starts out with a non-populated iataCode column. This populates the column.
-    if lowest_price > flight_data_object.price:
+    if flight_data_object is None:
+        continue
+    elif lowest_price > flight_data_object.price:
         my_data_manager.populate_price(price=flight_data_object.price, id=city_id)
         # if the current price is lower, populate the price column of the lower price.
         print("found a deal! sending email!")

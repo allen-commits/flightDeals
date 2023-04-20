@@ -44,7 +44,8 @@ class FlightSearch:
             "nights_in_dst_from": "6",
             "nights_in_dst_to": "27",
             "flight_type": "round",
-            "curr": "GBP"
+            "curr": "GBP",
+            "max_stopovers": "0"
         }
         headers = {
             "apikey": API_KEY

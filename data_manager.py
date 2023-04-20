@@ -19,7 +19,6 @@ class DataManager:
         response = requests.get(url=self.sheety_endpoint, headers=self.headers)
         sheety_json = json.loads(response.text)
         sheety_json_prices = sheety_json['prices']
-        print(os.environ['SHEETY_ENDPOINT'])
         return sheety_json_prices
 
     def populate_IATA_code(self, iataCode, id):
