@@ -28,6 +28,11 @@ class FlightSearch:
         iata_code = flight_search_json['locations'][0]['code']
         return iata_code
 
+    def convert_date(self, date):
+        date = datetime.fromisoformat(date[:-1])
+        date = date.strftime("%m/%d/%Y")
+        return date
+
     def search_for_flights(self, iata_code):
         """This searches the tequila.kiwi api for the cheapest flight between now and 6 months forward, then returns the
          values in a FlightData object"""
@@ -51,31 +56,46 @@ class FlightSearch:
             "apikey": API_KEY
         }
         response = requests.get(url=URL_SEARCH, params=json_data, headers=headers)
+        flight_search_json = json.loads(response.text)
 
         try:
             data = response.json()["data"][0]
         except IndexError:
-            print(f"Sorry! No flights found for {iata_code}")
-            return None
-        flight_search_json = json.loads(response.text)
+            json_data["max_stopovers"] = 2
+            headers = {
+                "apikey": API_KEY
+            }
+            response = requests.get(url=URL_SEARCH, params=json_data, headers=headers)
+            flight_search_json = json.loads(response.text)
 
-        api_outbound_date = flight_search_json['data'][0]['route'][0]['local_departure']
-        api_outbound_date = datetime.fromisoformat(api_outbound_date[:-1])
-        api_outbound_date = api_outbound_date.strftime("%m/%d/%Y")
+            api_outbound_date = self.convert_date(flight_search_json['data'][0]['route'][0]['local_departure'])
+            api_inbound_date = self.convert_date(flight_search_json['data'][0]['route'][0]['local_departure'])
 
-        api_inbound_date = flight_search_json['data'][1]['route'][1]['local_departure']
-        api_inbound_date = datetime.fromisoformat(api_inbound_date[:-1])
-        api_inbound_date = api_inbound_date.strftime("%m/%d/%Y")
+            flight_data = FlightData(
+                price=flight_search_json['data'][0]['price'],
+                origin_city=flight_search_json['data'][0]['cityFrom'],
+                origin_airport=flight_search_json['data'][0]['flyFrom'],
+                destination_city=flight_search_json['data'][0]['cityTo'],
+                destination_airport=flight_search_json['data'][0]['flyTo'],
+                out_date=api_outbound_date,
+                return_date=api_inbound_date,
+                stop_overs=1,
+                via_city=flight_search_json['data'][0]['route'][1]['cityCodeFrom']
+            )
+            return flight_data
+        else:
+            api_outbound_date = self.convert_date(flight_search_json['data'][0]['route'][0]['local_departure'])
+            api_inbound_date = self.convert_date(flight_search_json['data'][0]['route'][0]['local_departure'])
+            flight_data = FlightData(
+                price=flight_search_json['data'][0]['price'],
+                origin_city=flight_search_json['data'][0]['cityFrom'],
+                origin_airport=flight_search_json['data'][0]['flyFrom'],
+                destination_city=flight_search_json['data'][0]['cityTo'],
+                destination_airport=flight_search_json['data'][0]['flyTo'],
+                out_date=api_outbound_date,
+                return_date=api_inbound_date
+            )
+            return flight_data
 
-        flight_data = FlightData(
-            price=flight_search_json['data'][0]['price'],
-            origin_city=flight_search_json['data'][0]['cityFrom'],
-            origin_airport=flight_search_json['data'][0]['flyFrom'],
-            destination_city=flight_search_json['data'][0]['cityTo'],
-            destination_airport=flight_search_json['data'][0]['flyTo'],
-            out_date=api_outbound_date,
-            return_date=api_inbound_date
-        )
-        return flight_data
 
 

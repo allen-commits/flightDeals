@@ -23,10 +23,10 @@ for city_data in sheet_data:
         #my flight tracker sheet starts out with a non-populated iataCode column. This populates the column.
     if flight_data_object is None:
         continue
-    elif lowest_price > flight_data_object.price:
+    elif lowest_price > flight_data_object.price and flight_data_object.stop_overs == 0:
         my_data_manager.populate_price(price=flight_data_object.price, id=city_id)
         # if the current price is lower, populate the price column of the lower price.
-        print("found a deal! sending email!")
+        print("found a deal! sending email! no stop over")
         my_notification_manager.send_email(flight_data_object.price,
                                            flight_data_object.origin_city,
                                            flight_data_object.origin_airport,
@@ -34,6 +34,18 @@ for city_data in sheet_data:
                                            flight_data_object.destination_airport,
                                            flight_data_object.out_date,
                                            flight_data_object.return_date)
+    elif lowest_price > flight_data_object.price and flight_data_object.stop_overs > 0:
+        my_data_manager.populate_price(price=flight_data_object.price, id=city_id)
+        print(f"found a deal! for {city_id} sending email! There is a stop over in {flight_data_object.via_city}")
+        my_notification_manager.send_email(flight_data_object.price,
+                                           flight_data_object.origin_city,
+                                           flight_data_object.origin_airport,
+                                           flight_data_object.destination_city,
+                                           flight_data_object.destination_airport,
+                                           flight_data_object.out_date,
+                                           flight_data_object.return_date,
+                                           stop_overs=flight_data_object.stop_overs,
+                                           via_city=flight_data_object.via_city)
     print(f"{city_name}: {flight_data_object.price}")
 
 

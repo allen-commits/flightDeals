@@ -13,13 +13,26 @@ class NotificationManager:
                    api_arr_city_name,
                    api_arr_iata_code,
                    api_outbound_date,
-                   api_inbound_date):
+                   api_inbound_date,
+                   stop_overs=0,
+                   via_city=""):
         """this sends an email to my dummy email, alerting me of a new deal"""
-        with  smtplib.SMTP("smtp.gmail.com", port=587) as connection:
-            connection.starttls()
-            connection.login(user=self.MY_GMAIL_EMAIL, password=self.MY_GMAIL_EMAIL_PASSWORD)
-            connection.sendmail(from_addr=self.MY_GMAIL_EMAIL,
-                                to_addrs="SAMPLE@gmail.com",
-                                msg=f"Subject:Major deal alert!!\n\n Low price alert! Only {api_price} "
-                                    f"to fly from {api_dep_city_name}-{api_dep_iata_code} to {api_arr_city_name}-"
-                                    f"{api_arr_iata_code}, from {api_outbound_date} to {api_inbound_date}")
+        if stop_overs == 0:
+            with  smtplib.SMTP("smtp.gmail.com", port=587) as connection:
+                connection.starttls()
+                connection.login(user=self.MY_GMAIL_EMAIL, password=self.MY_GMAIL_EMAIL_PASSWORD)
+                connection.sendmail(from_addr=self.MY_GMAIL_EMAIL,
+                                    to_addrs="SAMPLE@gmail.com",
+                                    msg=f"Subject:Major deal alert!!\n\n Low price alert! Only {api_price} "
+                                        f"to fly from {api_dep_city_name}-{api_dep_iata_code} to {api_arr_city_name}-"
+                                        f"{api_arr_iata_code}, from {api_outbound_date} to {api_inbound_date}")
+        elif stop_overs != 0:
+            with  smtplib.SMTP("smtp.gmail.com", port=587) as connection:
+                connection.starttls()
+                connection.login(user=self.MY_GMAIL_EMAIL, password=self.MY_GMAIL_EMAIL_PASSWORD)
+                connection.sendmail(from_addr=self.MY_GMAIL_EMAIL,
+                                    to_addrs="SAMPLE@gmail.com",
+                                    msg=f"Subject:Major deal alert!!\n\n Low price alert! Only {api_price} "
+                                        f"to fly from {api_dep_city_name}-{api_dep_iata_code} to {api_arr_city_name}-"
+                                        f"{api_arr_iata_code}, from {api_outbound_date} to {api_inbound_date}, with a "
+                                        f"stopover in {via_city}")
